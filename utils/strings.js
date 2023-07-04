@@ -1,0 +1,20 @@
+export const globalStrings = {
+    passwordLimit: 16,
+    powredBy: 'John Doe',
+    user_name_empty: "Full Name Should Not Be Empty",
+    invalid_email: "Please Enter Valid Email ID",
+    password_empty: "Password Should Not Be Empty!",
+    invalid_password: "Password should contain 1 Uppercase letter, 1 Lowercase letter, 1 Special case and 1 Number",
+    password_not_mached: "Password and Confirm Password Do Not Match",
+    invalid_confirm_password: "Password and Confirm Password Do Not Match",
+    signup_success: "Sign up Successful!",
+    login_success: "Login Successful!",
+    request_success: "Request Successful!",
+    forgot_link_sended: "password reset link Sent To Your Email ID Successfully",
+    invalid_length_password: "The Password Should Contain At Least 8 Characters",
+    email_not_Found: " Kindly Enter Registered Email Id",
+    user_deactivated: "User Deactivated",
+    invalid_ced: "Wrong Email Id or Password",
+    password_cant_be_same : "Old and New password cannot be same.",
+    check_email : "Check Your Email"
+}
