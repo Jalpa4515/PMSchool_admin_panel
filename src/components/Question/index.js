@@ -38,7 +38,7 @@ const Question = () => {
       height: "20px",
      }}
      onClick={() => setIsOpen(!isOpen)}>
-     <img src={ArrowDownIcon} alt="" className="w-full h-full" />
+     <img src={ArrowDownIcon} alt="" className="w-100 h-100" />
     </button>
    </div>
    <div className={`question__body ${isOpen ? "d-block" : "d-none"}`}>
