@@ -1,16 +1,113 @@
+import {
+ addQuestion,
+ getCategories,
+ getEnrolmentReport,
+ getQuestions,
+ getStatistics,
+} from "api/ApiRequest";
 import Question from "components/Question";
-import { useState } from "react";
+import { format } from "date-fns";
+import { useEffect, useState } from "react";
+import { DateRange } from "react-date-range";
+import "react-date-range/dist/styles.css"; // main style file
+import "react-date-range/dist/theme/default.css"; // theme css file
 import ExportIcon from "../../assets/img/icons/common/export-icon.svg";
 import FilterIcon from "../../assets/img/icons/common/filter-icon.svg";
 import PlusIcon from "../../assets/img/icons/common/plus-circle.svg";
 
 const PmRun = () => {
  const [activeTab, setActiveTab] = useState("question");
- const [filterOpen, setFilerOpen] = useState(false);
+ const [filterOpen, setFilterOpen] = useState(false);
  const changeActiveTab = (e) => {
-  console.log(e);
   setActiveTab(e.target.getAttribute("aria-controls"));
  };
+ const [questionList, setQuestionList] = useState([]);
+ const [categories, setCategories] = useState([]);
+ const [filterDate, setFilterDate] = useState([
+  {
+   startDate: "",
+   endDate: "",
+   key: "selection",
+  },
+ ]);
+ const [filterData, setFilterData] = useState({});
+ const [reportData, setReportData] = useState("");
+
+ console.log({
+  startDate:
+   filterDate[0].startDate && format(filterDate[0].startDate, "yyyy-MM-dd"),
+  endData: filterDate[0].endDate && format(filterDate[0].endDate, "yyyy-MM-dd"),
+ });
+
+ const runGetStatistics = () => {
+  getStatistics({
+   startDate:
+    filterDate[0].startDate && format(filterDate[0].startDate, "yyyy-MM-dd"),
+   endData:
+    filterDate[0].endDate && format(filterDate[0].endDate, "yyyy-MM-dd"),
+  })
+   .then((response) => response)
+   .then((json) => setFilterData(json))
+   .catch((error) => console.error(error));
+ };
+
+ useEffect(() => {
+  getCategories()
+   .then((response) => response.data)
+   .then((json) => setCategories(json))
+   .catch((error) => console.error(error));
+
+  getEnrolmentReport()
+   .then((response) => response.data)
+   .then((json) => setReportData(json))
+   .catch((error) => console.error(error));
+
+  runGetStatistics();
+ }, [filterDate]);
+
+ const getAllQuestions = () => {
+  getQuestions()
+   .then((response) => response.data)
+   .then((json) => setQuestionList(json))
+   .catch((error) => console.error(error));
+ };
+
+ useEffect(() => {
+  getAllQuestions();
+ }, []);
+
+ const addNewQuestion = () => {
+  addQuestion({
+   question: "This is a question 1",
+   questionNo: questionList.length + 1,
+   categoryId: "64d34082ca259839767ef76e",
+   answers: [
+    {
+     answer: "This is a answer",
+     isCorrectAnswer: false,
+    },
+    {
+     answer: "This is a answer1",
+     isCorrectAnswer: false,
+    },
+    {
+     answer: "This is a answer1",
+     isCorrectAnswer: false,
+    },
+    {
+     answer: "This is a answer1",
+     isCorrectAnswer: false,
+    },
+   ],
+  })
+   .then(() => getAllQuestions())
+   .catch((error) => console.error(error));
+ };
+
+ const handleSelect = (date) => {
+  console.log(date); // native Date object
+ };
+
  return (
   <>
    <div className="header bg-gradient-info pb-2 pt-2 pt-md-8"></div>
@@ -106,8 +203,19 @@ const PmRun = () => {
       </div>
       <h1 className="mt-6 mb-4 text-dark">Questions & Answers</h1>
       <div className="questions__wrapper border-top border-light">
-       <Question />
-       <button className="add__question d-flex align-items-center border-0 bg-transparent mt-4">
+       {questionList?.map((question) => (
+        <Question
+         questionText={question.question}
+         answers={question.answers}
+         questionNo={question.questionNo}
+         categoryId={question.categoryId}
+         questionAll={question}
+         categories={categories}
+        />
+       ))}
+       <button
+        className="add__question d-flex align-items-center border-0 bg-transparent mt-4"
+        onClick={() => addNewQuestion()}>
         <img
          src={PlusIcon}
          alt=""
@@ -128,7 +236,7 @@ const PmRun = () => {
       aria-labelledby="nav-profile-tab">
       <h1 className="mt-5 text-dark">General Statistics</h1>
       <div className="action__buttons d-flex mt-5">
-       <div class="dropdown">
+       <div tabIndex="-1" class="dropdown">
         <button
          type="button"
          aria-haspopup="true"
@@ -137,7 +245,7 @@ const PmRun = () => {
          style={{
           background: "#5a5a5a",
          }}
-         onClick={() => setFilerOpen(!filterOpen)}>
+         onClick={() => setFilterOpen(!filterOpen)}>
          <img
           className="mr-2"
           style={{
@@ -150,12 +258,11 @@ const PmRun = () => {
          <span className="text-white">Filter</span>
         </button>
         <div
-         tabindex="-1"
          role="menu"
          aria-labelledby="navbar-default_dropdown_1"
          aria-hidden="false"
-         class={`dropdown-menu-arrow dropdown-menu ${
-          filterOpen ? "show" : "hide"
+         class={`dropdown-menu-arrow dropdown-menu p-0 transition  ${
+          filterOpen ? "d-flex" : "hide"
          }`}
          x-placement="bottom-start"
          style={{
@@ -165,36 +272,15 @@ const PmRun = () => {
           left: "0px",
           transform: "translate3d(0px, 43px, 0px)",
          }}>
-         <button
-          type="button"
-          tabindex="0"
-          role="menuitem"
-          class="dropdown-item">
-          Live
-         </button>
-         <button
-          type="button"
-          tabindex="0"
-          role="menuitem"
-          class="dropdown-item">
-          Past
-         </button>
-         <div tabindex="-1" class="dropdown-divider"></div>
-         <button
-          type="button"
-          tabindex="0"
-          role="menuitem"
-          class="dropdown-item">
-          Completed
-         </button>
-         <div tabindex="-1" class="dropdown-divider"></div>
-         <button
-          type="button"
-          tabindex="0"
-          role="menuitem"
-          class="dropdown-item">
-          All
-         </button>
+         <DateRange
+          editableDateInputs={true}
+          onChange={(item) => {
+           setFilterDate([item.selection]);
+          }}
+          moveRangeOnFirstSelection={false}
+          ranges={filterDate}
+          dateDisplayFormat="MMM d, yyyy"
+         />
         </div>
        </div>
        <button
@@ -204,6 +290,9 @@ const PmRun = () => {
         class="nav-link-icon btn rounded-pill d-flex align-items-center px-5"
         style={{
          background: "#5a5a5a",
+        }}
+        onClick={() => {
+         window.open(filterData.data.toString());
         }}>
         <img
          className="mr-2"
@@ -227,7 +316,7 @@ const PmRun = () => {
          Total number of users
         </p>
         <span className="h1 mb-0 lh-100 mt-2 font-weight-700 text-dark">
-         123
+         {filterData.totalnumberofusers}
         </span>
        </div>
        <div
@@ -244,7 +333,7 @@ const PmRun = () => {
          Users for 7 Day Run
         </p>
         <span className="h1 mb-0 lh-100 mt-2 font-weight-700 text-dark">
-         28
+         {filterData.usersfor7day}
         </span>
        </div>
        <div
@@ -261,7 +350,7 @@ const PmRun = () => {
          Users for 30 Day Run
         </p>
         <span className="h1 mb-0 lh-100 mt-2 font-weight-700 text-dark">
-         120
+         {filterData.usersfor30day}
         </span>
        </div>
       </div>
@@ -274,25 +363,27 @@ const PmRun = () => {
       <p className="text-dark font-weight-400">
        Export day-wise report of all the enrolled users
       </p>
-      <button
-       type="button"
-       aria-haspopup="true"
-       aria-expanded="true"
-       class="nav-link-icon btn rounded-pill d-flex align-items-center px-5 mt-5"
-       style={{
-        background: "#5a5a5a",
-       }}>
-       <img
-        className="mr-2"
+      <a href={reportData}>
+       <button
+        type="button"
+        aria-haspopup="true"
+        aria-expanded="true"
+        class="nav-link-icon btn rounded-pill d-flex align-items-center px-5 mt-5"
         style={{
-         width: "18px",
-         height: "18px",
-        }}
-        src={ExportIcon}
-        alt=""
-       />
-       <span className="text-white">Export</span>
-      </button>
+         background: "#5a5a5a",
+        }}>
+        <img
+         className="mr-2"
+         style={{
+          width: "18px",
+          height: "18px",
+         }}
+         src={ExportIcon}
+         alt=""
+        />
+        <span className="text-white">Export</span>
+       </button>
+      </a>
      </div>
     </div>
    </div>

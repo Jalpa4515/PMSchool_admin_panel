@@ -1,4 +1,3 @@
-
 // export const BASE_URL = "http://127.0.0.1:4000/";
 export const BASE_URL = "http://dev.pmschool.io:4000/";
 //export const BASE_URL = "https://dev.pmschool.io:4000/";
@@ -21,11 +20,16 @@ export const SUBMITTOLIVE = "/admin/entries/submit_to_live";
 export const GETLEADERBOARD = "/admin/entries/get_leaderboard";
 export const GETCONFIGDATE = "admin/config/get_cohort_date";
 export const ADDCONFIGDATE = "admin/config/save_cohort_date";
-export const EXPORTUSER = "admin/export_user"
-export const UPDATELEADERBOARD = "admin/entries/update_leaderboard"
+export const EXPORTUSER = "admin/export_user";
+export const UPDATELEADERBOARD = "admin/entries/update_leaderboard";
 export const AUTORANK = "/admin/entries/auto_rank";
-export const EXPORTLEADERBOARD = "admin/entries/export_leaderboard"
-
+export const EXPORTLEADERBOARD = "admin/entries/export_leaderboard";
+export const GETQUESTIONS = "admin/pmrun/getQuestions";
+export const ADDQUESTION = "admin/pmrun/add_pmrunquestions";
+export const GETCATEGORIES = "admin/pmrun/getCategories";
+export const UPDATEQUESTION = "admin/pmrun/editpmrunquestions";
+export const GETSTATISTICS = "admin/pmrun/getStatistics";
+export const GETENROLMENTREPORT = "admin/pmrun/getReport";
 
 export const EMAIL = "email";
 export const PASSWORD = "password";
