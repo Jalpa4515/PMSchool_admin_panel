@@ -1,5 +1,4 @@
 import {
- addQuestion,
  getCategories,
  getEnrolmentReport,
  getQuestions,
@@ -18,6 +17,7 @@ import PlusIcon from "../../assets/img/icons/common/plus-circle.svg";
 const PmRun = () => {
  const [activeTab, setActiveTab] = useState("question");
  const [filterOpen, setFilterOpen] = useState(false);
+ const [newQuestions, setNewQuestion] = useState([]);
  const changeActiveTab = (e) => {
   setActiveTab(e.target.getAttribute("aria-controls"));
  };
@@ -32,12 +32,6 @@ const PmRun = () => {
  ]);
  const [filterData, setFilterData] = useState({});
  const [reportData, setReportData] = useState("");
-
- console.log({
-  startDate:
-   filterDate[0].startDate && format(filterDate[0].startDate, "yyyy-MM-dd"),
-  endData: filterDate[0].endDate && format(filterDate[0].endDate, "yyyy-MM-dd"),
- });
 
  const runGetStatistics = () => {
   getStatistics({
@@ -77,35 +71,57 @@ const PmRun = () => {
  }, []);
 
  const addNewQuestion = () => {
-  addQuestion({
-   question: "This is a question 1",
-   questionNo: questionList.length + 1,
-   categoryId: "64d34082ca259839767ef76e",
-   answers: [
-    {
-     answer: "This is a answer",
-     isCorrectAnswer: false,
-    },
-    {
-     answer: "This is a answer1",
-     isCorrectAnswer: false,
-    },
-    {
-     answer: "This is a answer1",
-     isCorrectAnswer: false,
-    },
-    {
-     answer: "This is a answer1",
-     isCorrectAnswer: false,
-    },
-   ],
-  })
-   .then(() => getAllQuestions())
-   .catch((error) => console.error(error));
- };
-
- const handleSelect = (date) => {
-  console.log(date); // native Date object
+  setNewQuestion([
+   ...newQuestions,
+   {
+    question: "This is a question 1",
+    questionNo: questionList.length + 1 + newQuestions.length,
+    categoryId: "64d34082ca259839767ef76e",
+    answers: [
+     {
+      answer: "This is a answer",
+      isCorrectAnswer: false,
+     },
+     {
+      answer: "This is a answer1",
+      isCorrectAnswer: false,
+     },
+     {
+      answer: "This is a answer1",
+      isCorrectAnswer: false,
+     },
+     {
+      answer: "This is a answer1",
+      isCorrectAnswer: false,
+     },
+    ],
+   },
+  ]);
+  // addQuestion({
+  //  question: "This is a question 1",
+  //  questionNo: questionList.length + 1,
+  //  categoryId: "64d34082ca259839767ef76e",
+  //  answers: [
+  //   {
+  //    answer: "This is a answer",
+  //    isCorrectAnswer: false,
+  //   },
+  //   {
+  //    answer: "This is a answer1",
+  //    isCorrectAnswer: false,
+  //   },
+  //   {
+  //    answer: "This is a answer1",
+  //    isCorrectAnswer: false,
+  //   },
+  //   {
+  //    answer: "This is a answer1",
+  //    isCorrectAnswer: false,
+  //   },
+  //  ],
+  // })
+  //  .then(() => getAllQuestions())
+  //  .catch((error) => console.error(error));
  };
 
  return (
@@ -211,6 +227,20 @@ const PmRun = () => {
          categoryId={question.categoryId}
          questionAll={question}
          categories={categories}
+        />
+       ))}
+       {newQuestions?.map((question) => (
+        <Question
+         questionText={question.question}
+         answers={question.answers}
+         questionNo={question.questionNo}
+         categoryId={question.categoryId}
+         questionAll={question}
+         categories={categories}
+         newQuestions={newQuestions}
+         setNewQuestion={setNewQuestion}
+         getAllQuestions={getAllQuestions}
+         questionList={questionList}
         />
        ))}
        <button

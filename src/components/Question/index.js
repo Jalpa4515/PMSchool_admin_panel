@@ -1,5 +1,6 @@
-import { updateQuestion } from "api/ApiRequest";
+import { addQuestion, updateQuestion } from "api/ApiRequest";
 import { useState } from "react";
+import { useAlert } from "react-alert";
 import {
  DropdownItem,
  DropdownMenu,
@@ -16,6 +17,10 @@ const Question = ({
  categoryId,
  questionAll,
  categories,
+ setNewQuestion,
+ getAllQuestions,
+ questionList,
+ newQuestions,
 }) => {
  const [isOpen, setIsOpen] = useState(false);
 
@@ -25,33 +30,69 @@ const Question = ({
   answers,
   categoryId,
  });
+ const alert = useAlert();
 
  const saveChanges = (e) => {
   e.preventDefault();
-  console.log({ ...questionAll, ...question });
-  updateQuestion({
-   ...questionAll,
-   answers: question.answers,
-   categoryId: question.categoryId,
-   question: question.questionText,
-   questionNo: question.questionNo,
-  }).catch((error) => console.error(error));
+  let isChecked = false;
+  question.answers.forEach((answer) => {
+   console.log(answer.isCorrectAnswer);
+   if (answer.isCorrectAnswer === true) {
+    isChecked = true;
+   }
+  });
+  if (isChecked) {
+   if (setNewQuestion) {
+    addQuestion({
+     question: question.questionText,
+     questionNo: questionList.length + 1,
+     categoryId: question.categoryId,
+     answers: answers,
+    })
+     .then(() => {
+      alert.success(`Question ${question.questionNo} added`);
+     })
+     .catch((error) => console.error(error));
+   } else {
+    updateQuestion({
+     ...questionAll,
+     answers: question.answers,
+     categoryId: question.categoryId,
+     question: question.questionText,
+     questionNo: question.questionNo,
+    })
+     .then(() => {
+      alert.success(`Question ${question.questionNo} updated`);
+     })
+     .catch((error) => console.error(error));
+   }
+  } else {
+   alert.error(`Please, check at least one right answer`);
+  }
  };
 
- //  useEffect(() => {
- //   const updatedQuestionList = questionList;
- //   updatedQuestionList.forEach((updatedQuestion, index) => {
- //    if (updatedQuestion.questionNo === questionNo) {
- //     updatedQuestionList[index] = {
- //      ...updatedQuestionList[index],
- //      question: question.questionText,
- //      answers: question.answers,
- //     };
- //    }
- //   });
- //   setQuestionList(updatedQuestionList);
- //   console.log(updatedQuestionList);
- //  }, [question]);
+ const cancelChanges = (e) => {
+  e.preventDefault();
+  if (setNewQuestion) {
+   const updatedNewQuestions = newQuestions.filter(
+    (newQuestion) => newQuestion.questionNo !== question.questionNo
+   );
+   updatedNewQuestions.forEach((newQuestion, index) => {
+    newQuestion.questionNo = questionList.length + 1;
+   });
+   setNewQuestion(updatedNewQuestions);
+   alert.success(`Question ${question.questionNo} removed`);
+  } else {
+   setQuestion({
+    questionNo,
+    questionText,
+    answers,
+    categoryId,
+   });
+   alert.success(`Question ${question.questionNo} changes has been canceled`);
+  }
+ };
+
  return (
   <div className="question border-bottom border-light py-3">
    <div className="question__head d-flex align-items-center">
@@ -69,7 +110,8 @@ const Question = ({
      style={{
       width: "14px",
       height: "14px",
-     }}>
+     }}
+     onClick={() => setIsOpen(true)}>
      <img src={EditIcon} alt="" className="w-100 h-100" />
     </button>
     <button
@@ -147,7 +189,7 @@ const Question = ({
         <input
          type="checkbox"
          name=""
-         id="questionAnsRightOption1"
+         id={`questionAnsRightOption${index}`}
          className=""
          defaultChecked={answer.isCorrectAnswer}
          onChange={(e) => {
@@ -170,10 +212,14 @@ const Question = ({
      <div className="action__buttons mt-5 ml-auto">
       <button
        className="border-0 px-5 py-2 rounded-pill bg-dark text-white mr-3"
-       onClick={(e) => saveChanges(e)}>
+       onClick={(e) => saveChanges(e)}
+       type="submit">
        Save
       </button>
-      <button className="px-5 py-2 rounded-pill bg-white text-dark border border-light">
+      <button
+       className="px-5 py-2 rounded-pill bg-white text-dark border border-light"
+       type="submit"
+       onClick={(e) => cancelChanges(e)}>
        Cancel
       </button>
      </div>
