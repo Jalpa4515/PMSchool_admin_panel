@@ -1,5 +1,5 @@
-import { addQuestion, updateQuestion } from "api/ApiRequest";
-import { useState } from "react";
+import { addQuestion, getQuestions, updateQuestion } from "api/ApiRequest";
+import { useEffect, useState } from "react";
 import { useAlert } from "react-alert";
 import {
  DropdownItem,
@@ -21,53 +21,86 @@ const Question = ({
  getAllQuestions,
  questionList,
  newQuestions,
+ questionOpen,
+ previousQuestionList,
 }) => {
- const [isOpen, setIsOpen] = useState(false);
-
+ const [isOpen, setIsOpen] = useState(questionOpen || false);
  const [question, setQuestion] = useState({
   questionNo,
   questionText,
   answers,
-  categoryId,
+  categoryId: "",
+  _id: questionAll._id,
  });
+ const [defaultAnswers, setDefaultAnswers] = useState();
  const alert = useAlert();
+
+ useEffect(() => {
+  getQuestions()
+   .then((response) => response.data)
+   .then((json) => {
+    json.forEach((item) => {
+     item._id === question._id && setDefaultAnswers(item.answers);
+    });
+   })
+   .catch((error) => console.error(error));
+ }, []);
+
+ console.log(defaultAnswers);
 
  const saveChanges = (e) => {
   e.preventDefault();
   let isChecked = false;
+  let isAnsFilled = true;
   question.answers.forEach((answer) => {
-   console.log(answer.isCorrectAnswer);
    if (answer.isCorrectAnswer === true) {
     isChecked = true;
    }
   });
-  if (isChecked) {
-   if (setNewQuestion) {
-    addQuestion({
-     question: question.questionText,
-     questionNo: questionList.length + 1,
-     categoryId: question.categoryId,
-     answers: answers,
-    })
-     .then(() => {
-      alert.success(`Question ${question.questionNo} added`);
-     })
-     .catch((error) => console.error(error));
+  for (let i = 0; i < question.answers.length; i++) {
+   if (
+    question.answers[i].answer === "" ||
+    question.answers[i].answer === undefined
+   ) {
+    isAnsFilled = false;
+    break;
+   }
+  }
+  if (isAnsFilled && question.questionText) {
+   if (isChecked) {
+    if (question.categoryId) {
+     if (setNewQuestion) {
+      addQuestion({
+       question: question.questionText,
+       questionNo: questionList.length + 1,
+       categoryId: question.categoryId,
+       answers: answers,
+      })
+       .then(() => {
+        alert.success(`Question ${question.questionNo} added`);
+       })
+       .catch((error) => console.error(error));
+     } else {
+      updateQuestion({
+       ...questionAll,
+       answers: question.answers,
+       categoryId: question.categoryId,
+       question: question.questionText,
+       questionNo: question.questionNo,
+      })
+       .then(() => {
+        alert.success(`Question ${question.questionNo} updated`);
+       })
+       .catch((error) => console.error(error));
+     }
+    } else {
+     alert.error(`Please, select a category`);
+    }
    } else {
-    updateQuestion({
-     ...questionAll,
-     answers: question.answers,
-     categoryId: question.categoryId,
-     question: question.questionText,
-     questionNo: question.questionNo,
-    })
-     .then(() => {
-      alert.success(`Question ${question.questionNo} updated`);
-     })
-     .catch((error) => console.error(error));
+    alert.error(`Please, check at least one right answer`);
    }
   } else {
-   alert.error(`Please, check at least one right answer`);
+   alert.error(`Please, fill all the inputs`);
   }
  };
 
@@ -86,7 +119,7 @@ const Question = ({
    setQuestion({
     questionNo,
     questionText,
-    answers,
+    answers: defaultAnswers,
     categoryId,
    });
    alert.success(`Question ${question.questionNo} changes has been canceled`);
@@ -160,7 +193,8 @@ const Question = ({
          ...question,
          questionText: e.target.value,
         });
-       }}></textarea>
+       }}
+       required></textarea>
      </div>
      {question.answers?.map((answer, index) => (
       <div className="question__ans d-flex mt-3">
@@ -182,7 +216,8 @@ const Question = ({
            ...question,
            answers: updatedAns,
           });
-         }}></textarea>
+         }}
+         required></textarea>
        </div>
        <div className="questionAns__rightOption d-flex flex-column align-items-baseline">
         <label htmlFor="questionAnsRightOption1">Right option</label>
@@ -218,7 +253,6 @@ const Question = ({
       </button>
       <button
        className="px-5 py-2 rounded-pill bg-white text-dark border border-light"
-       type="submit"
        onClick={(e) => cancelChanges(e)}>
        Cancel
       </button>

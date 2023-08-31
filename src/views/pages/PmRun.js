@@ -22,6 +22,7 @@ const PmRun = () => {
   setActiveTab(e.target.getAttribute("aria-controls"));
  };
  const [questionList, setQuestionList] = useState([]);
+ const [previousQuestionList, setPreviousQuestionList] = useState([]);
  const [categories, setCategories] = useState([]);
  const [filterDate, setFilterDate] = useState([
   {
@@ -62,7 +63,10 @@ const PmRun = () => {
  const getAllQuestions = () => {
   getQuestions()
    .then((response) => response.data)
-   .then((json) => setQuestionList(json))
+   .then((json) => {
+    setQuestionList(json);
+    setPreviousQuestionList(json);
+   })
    .catch((error) => console.error(error));
  };
 
@@ -74,54 +78,29 @@ const PmRun = () => {
   setNewQuestion([
    ...newQuestions,
    {
-    question: "This is a question 1",
+    question: "",
     questionNo: questionList.length + 1 + newQuestions.length,
     categoryId: "64d34082ca259839767ef76e",
     answers: [
      {
-      answer: "This is a answer",
+      answer: "",
       isCorrectAnswer: false,
      },
      {
-      answer: "This is a answer1",
+      answer: "",
       isCorrectAnswer: false,
      },
      {
-      answer: "This is a answer1",
+      answer: "",
       isCorrectAnswer: false,
      },
      {
-      answer: "This is a answer1",
+      answer: "",
       isCorrectAnswer: false,
      },
     ],
    },
   ]);
-  // addQuestion({
-  //  question: "This is a question 1",
-  //  questionNo: questionList.length + 1,
-  //  categoryId: "64d34082ca259839767ef76e",
-  //  answers: [
-  //   {
-  //    answer: "This is a answer",
-  //    isCorrectAnswer: false,
-  //   },
-  //   {
-  //    answer: "This is a answer1",
-  //    isCorrectAnswer: false,
-  //   },
-  //   {
-  //    answer: "This is a answer1",
-  //    isCorrectAnswer: false,
-  //   },
-  //   {
-  //    answer: "This is a answer1",
-  //    isCorrectAnswer: false,
-  //   },
-  //  ],
-  // })
-  //  .then(() => getAllQuestions())
-  //  .catch((error) => console.error(error));
  };
 
  return (
@@ -219,16 +198,19 @@ const PmRun = () => {
       </div>
       <h1 className="mt-6 mb-4 text-dark">Questions & Answers</h1>
       <div className="questions__wrapper border-top border-light">
-       {questionList?.map((question) => (
-        <Question
-         questionText={question.question}
-         answers={question.answers}
-         questionNo={question.questionNo}
-         categoryId={question.categoryId}
-         questionAll={question}
-         categories={categories}
-        />
-       ))}
+       {questionList?.map((question) => {
+        return (
+         <Question
+          questionText={question.question}
+          answers={question.answers}
+          questionNo={question.questionNo}
+          categoryId={question.categoryId}
+          questionAll={question}
+          categories={categories}
+          previousQuestionList={previousQuestionList}
+         />
+        );
+       })}
        {newQuestions?.map((question) => (
         <Question
          questionText={question.question}
@@ -241,6 +223,7 @@ const PmRun = () => {
          setNewQuestion={setNewQuestion}
          getAllQuestions={getAllQuestions}
          questionList={questionList}
+         questionOpen={true}
         />
        ))}
        <button
