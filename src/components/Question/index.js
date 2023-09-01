@@ -29,7 +29,7 @@ const Question = ({
   questionNo,
   questionText,
   answers,
-  categoryId: "",
+  categoryId,
   _id: questionAll._id,
  });
  const [defaultAnswers, setDefaultAnswers] = useState();
@@ -46,7 +46,7 @@ const Question = ({
    .catch((error) => console.error(error));
  }, []);
 
- console.log(defaultAnswers);
+ console.log(question.categoryId);
 
  const saveChanges = (e) => {
   e.preventDefault();

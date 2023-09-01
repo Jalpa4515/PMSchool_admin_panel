@@ -80,7 +80,7 @@ const PmRun = () => {
    {
     question: "",
     questionNo: questionList.length + 1 + newQuestions.length,
-    categoryId: "64d34082ca259839767ef76e",
+    categoryId: "",
     answers: [
      {
       answer: "",
