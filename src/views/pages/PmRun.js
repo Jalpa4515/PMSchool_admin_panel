@@ -65,6 +65,11 @@ const PmRun = () => {
    .then((response) => response.data)
    .then((json) => {
     setQuestionList(json);
+   })
+   .catch((error) => console.error(error));
+  getQuestions()
+   .then((response) => response.data)
+   .then((json) => {
     setPreviousQuestionList(json);
    })
    .catch((error) => console.error(error));
@@ -208,6 +213,7 @@ const PmRun = () => {
           questionAll={question}
           categories={categories}
           previousQuestionList={previousQuestionList}
+          getAllQuestions={getAllQuestions}
          />
         );
        })}
@@ -228,7 +234,8 @@ const PmRun = () => {
        ))}
        <button
         className="add__question d-flex align-items-center border-0 bg-transparent mt-4"
-        onClick={() => addNewQuestion()}>
+        onClick={() => addNewQuestion()}
+        disabled={newQuestions.length > 0}>
         <img
          src={PlusIcon}
          alt=""

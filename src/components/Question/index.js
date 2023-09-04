@@ -1,4 +1,4 @@
-import { addQuestion, getQuestions, updateQuestion } from "api/ApiRequest";
+import { addQuestion, updateQuestion } from "api/ApiRequest";
 import { useEffect, useState } from "react";
 import { useAlert } from "react-alert";
 import {
@@ -36,17 +36,10 @@ const Question = ({
  const alert = useAlert();
 
  useEffect(() => {
-  getQuestions()
-   .then((response) => response.data)
-   .then((json) => {
-    json.forEach((item) => {
-     item._id === question._id && setDefaultAnswers(item.answers);
-    });
-   })
-   .catch((error) => console.error(error));
- }, []);
-
- console.log(question.categoryId);
+  previousQuestionList?.forEach((item) => {
+   item._id === question._id && setDefaultAnswers(item.answers);
+  });
+ }, [previousQuestionList, defaultAnswers]);
 
  const saveChanges = (e) => {
   e.preventDefault();
@@ -77,6 +70,8 @@ const Question = ({
        answers: answers,
       })
        .then(() => {
+        setNewQuestion([]);
+        getAllQuestions();
         alert.success(`Question ${question.questionNo} added`);
        })
        .catch((error) => console.error(error));
@@ -93,6 +88,7 @@ const Question = ({
        })
        .catch((error) => console.error(error));
      }
+     setIsOpen(false);
     } else {
      alert.error(`Please, select a category`);
     }
